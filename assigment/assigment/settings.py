@@ -23,7 +23,7 @@ import os
 SECRET_KEY = 'django-insecure-z4vo!5ak#jjvrccqvl%f28%!wpwpq_bvc0lle$kag%#n8&125x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'books'
+    'books',
+    'student'
 ]
 
 MIDDLEWARE = [
@@ -80,6 +81,21 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'your_database_name',  # Database name
+#         'USER': 'your_database_user',  # MySQL username
+#         'PASSWORD': 'your_password',   # MySQL password
+#         'HOST': 'localhost',           # Set to '127.0.0.1' or your database server's address
+#         'PORT': '3306',                # MySQL port (default is 3306)
+#     }
+# }
+
+
+
 
 
 # Password validation

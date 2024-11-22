@@ -19,6 +19,7 @@ def home(request):
 def search_view(request):
 
     search_query = request.GET.get('query', '')
+    
     if search_query:
         headers = {
             'Accept': '*/*',

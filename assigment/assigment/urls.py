@@ -17,7 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from books import views
+from student import student_views
+from django.views.generic import RedirectView
+from django.urls import path, re_path
 urlpatterns = [
     path('', views.home), 
-    path('search_books', views.search_view, name='query'), 
+    path('search_books', views.search_view, name='query'),
+    path('student', student_views.create), 
+    re_path(r'^(?!search_books|student).*$', RedirectView.as_view(url='/')),
 ]   
