@@ -9,17 +9,19 @@ from django.core import serializers
 
 @csrf_exempt
 def create(request):
-    if request.method == "POST":
-        return add_record(request)
-    else:
-        search_student_id = request.GET.get('id', '')
-        if search_student_id:
-            if search_student_id.isdigit():
-                return get_record_by_id(search_student_id)
-            else:
-                return no_record_msg()
-        return get_all_records(request)
-
+    try:
+        if request.method == "POST":
+            return add_record(request)
+        else:
+            search_student_id = request.GET.get('id', '')
+            if search_student_id:
+                if search_student_id.isdigit():
+                    return get_record_by_id(search_student_id)
+                else:
+                    return no_record_msg()
+            return get_all_records(request)
+    except:
+        return something_weng_wrong()
 
 def add_record(request):
 
@@ -46,32 +48,44 @@ def add_record(request):
 
 
 def get_all_records(request):
-    all_students = Student.objects.all()
-    serialized_data = serializers.serialize('json', all_students)
-    students_data = json.loads(serialized_data)
-    students_data = [entry['fields'] for entry in students_data]
-    results = {}
-    results['message'] = 'data retrieved successfully'
-    results['status'] = 200
-    results['data'] = students_data
-
-    return JsonResponse(results)
-
-
-def get_record_by_id(search_student_id):
-
-    student_data = Student.objects.filter(id=search_student_id)
-    if student_data:
-        serialized_data = serializers.serialize('json', student_data)
+    try:
+        all_students = Student.objects.all()
+        serialized_data = serializers.serialize('json', all_students)
         students_data = json.loads(serialized_data)
         students_data = [entry['fields'] for entry in students_data]
         results = {}
         results['message'] = 'data retrieved successfully'
         results['status'] = 200
         results['data'] = students_data
+
         return JsonResponse(results)
-    else:
-        return no_record_msg()
+    except:
+        return something_weng_wrong()
+
+def get_record_by_id(search_student_id):
+
+    try:
+        student_data = Student.objects.filter(id=search_student_id)
+        if student_data:
+            serialized_data = serializers.serialize('json', student_data)
+            students_data = json.loads(serialized_data)
+            students_data = [entry['fields'] for entry in students_data]
+            results = {}
+            results['message'] = 'data retrieved successfully'
+            results['status'] = 200
+            results['data'] = students_data
+            return JsonResponse(results)
+        else:
+            return no_record_msg()
+    except:
+        return something_weng_wrong()
+
+
+def something_weng_wrong():
+    results = {}
+    results['message'] = 'Something went wrong'
+    results['status'] = 404
+    return JsonResponse(results)
 
 
 def no_record_msg():
