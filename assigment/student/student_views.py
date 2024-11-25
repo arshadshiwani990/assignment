@@ -1,10 +1,11 @@
 from django import forms
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Student
-from .forms import StudentForm
+from .forms import StudentForm,StudentFormUpdate
 import json
 from django.core import serializers
+
 
 
 @csrf_exempt
@@ -19,7 +20,8 @@ def create(request):
                     return get_record_by_id(search_student_id)
                 else:
                     return no_record_msg()
-            return get_all_records(request)
+            else:
+                return get_all_records()
     except:
         return something_weng_wrong()
 
@@ -47,9 +49,10 @@ def add_record(request):
         return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
 
 
-def get_all_records(request):
+def get_all_records():
     try:
         all_students = Student.objects.all()
+
         serialized_data = serializers.serialize('json', all_students)
         students_data = json.loads(serialized_data)
         students_data = [entry['fields'] for entry in students_data]
@@ -59,7 +62,8 @@ def get_all_records(request):
         results['data'] = students_data
 
         return JsonResponse(results)
-    except:
+    except Exception as e:
+        print(e)
         return something_weng_wrong()
 
 def get_record_by_id(search_student_id):
@@ -93,3 +97,36 @@ def no_record_msg():
     results['message'] = 'No Such Record Found'
     results['status'] = 200
     return JsonResponse(results)
+
+
+
+
+@csrf_exempt
+def update(request,id):
+    if request.method=='POST':
+        try:
+            student = Student.objects.get(id=id)
+            StudentForm_=StudentFormUpdate(json.loads(request.body),instance=student)
+            if StudentForm_.is_valid():
+                StudentForm_.save()
+                return JsonResponse({'status': 200, 'message': 'Student updated successfully'})
+            else:
+                return JsonResponse({'status': 400, 'errors': StudentForm_.errors})
+        except Student.DoesNotExist:
+            return JsonResponse({'error': 'Student not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        
+
+def delete(request,id):
+
+    try:
+        student=Student.objects.get(id=id)
+        student.delete()
+        return JsonResponse({'status': 200, 'message': 'Student deleted successfully'})
+    except Student.DoesNotExist:
+        return JsonResponse({'error': 'Student not found'}, status=404)
+    except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)

@@ -24,5 +24,7 @@ urlpatterns = [
     path('', views.home), 
     path('search_books', views.search_view, name='query'),
     path('student', student_views.create), 
+    path('student/<int:id>/update', student_views.update), 
+    path('student/<int:id>/delete', student_views.delete), 
     re_path(r'^(?!search_books|student).*$', RedirectView.as_view(url='/')),
 ]   
